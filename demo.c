@@ -41,8 +41,17 @@ int main(int argc, char *argv[])
 
     /* here is an example for how to use readAndParse to read a line from
         inFilePtr */
+    int onijang=0;
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
         /* reached end of file */
+        if (!strcmp(opcode, ".fill")) {
+            if(isNumber(arg0)==1){
+                int wr = atoi(arg0);
+                fprintf(outFilePtr, "%d", wr);
+            }else{
+
+            }
+        }
         if (!strcmp(opcode, "add")) {
         /* do whatever you need to do for opcode "add" */
             int op = 0b000;
@@ -68,6 +77,7 @@ int main(int argc, char *argv[])
             fprintf(outFilePtr, "%d", wr);
         }
         fprintf(outFilePtr,"%s","\n");
+        onijang++;
     }
 
     /* this is how to rewind the file ptr so that you start reading from the
@@ -152,3 +162,5 @@ int toOType(int opcode){
     int instr = opcode << 22;
     return instr;
 }
+
+
