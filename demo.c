@@ -41,8 +41,33 @@ int main(int argc, char *argv[])
 
     /* here is an example for how to use readAndParse to read a line from
         inFilePtr */
-    if (! readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
+    while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
         /* reached end of file */
+        if (!strcmp(opcode, "add")) {
+        /* do whatever you need to do for opcode "add" */
+            int op = 0b000;
+            int wr;
+            wr = toRType(label, op, arg0, arg1, arg2);
+            fprintf(outFilePtr, "%d", wr);
+        }
+        if (!strcmp(opcode, "nand")) {
+        /* do whatever you need to do for opcode "nand" */
+            int op = 0b001;
+            int wr = 0;
+            wr = toRType(label, op, arg0, arg1, arg2);
+            fprintf(outFilePtr, "%d", wr);
+        }
+        if (!strcmp(opcode, "halt")) {
+            int op = 0b110;
+            int wr = toOType(op);
+            fprintf(outFilePtr, "%d", wr);
+        }
+        if (!strcmp(opcode, "noop")) {
+            int op = 0b111;
+            int wr = toOType(op);
+            fprintf(outFilePtr, "%d", wr);
+        }
+        fprintf(outFilePtr,"%s","\n");
     }
 
     /* this is how to rewind the file ptr so that you start reading from the
@@ -51,30 +76,7 @@ int main(int argc, char *argv[])
 
     /* after doing a readAndParse, you may want to do the following to test the
         opcode */
-    if (!strcmp(opcode, "add")) {
-        /* do whatever you need to do for opcode "add" */
-        int op = 0b000;
-        int wr;
-        wr = toRType(label, op, arg0, arg1, arg2);
-        fprintf(outFilePtr, "%d", wr);
-    }
-    if (!strcmp(opcode, "nand")) {
-        /* do whatever you need to do for opcode "nand" */
-        int op = 0b001;
-        int wr = 0;
-        wr = toRType(label, op, arg0, arg1, arg2);
-        fprintf(outFilePtr, "%d", wr);
-    }
-    if (!strcmp(opcode, "halt")) {
-        int op = 0b110;
-        int wr = toOType(op);
-        fprintf(outFilePtr, "%d", wr);
-    }
-    if (!strcmp(opcode, "noop")) {
-        int op = 0b111;
-        int wr = toOType(op);
-        fprintf(outFilePtr, "%d", wr);
-    }
+
     return(0);
 }
 
