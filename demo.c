@@ -8,7 +8,8 @@
 
 int readAndParse(FILE *, char *, char *, char *, char *, char *);
 int isNumber(char *);
-
+int toRType(char *, int, char *, char *, char *);
+int instrcheck(FILE *);
 int main(int argc, char *argv[])
 {
     char *inFileString, *outFileString;
@@ -22,8 +23,8 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    inFileString = argv[1]; //assem
-    outFileString = argv[2]; //mach
+    inFileString = argv[1]; 
+    outFileString = argv[2]; 
 
     inFilePtr = fopen(inFileString, "r");
     if (inFilePtr == NULL) {
@@ -36,6 +37,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
+
     /* here is an example for how to use readAndParse to read a line from
         inFilePtr */
     if (! readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
@@ -44,14 +46,24 @@ int main(int argc, char *argv[])
 
     /* this is how to rewind the file ptr so that you start reading from the
         beginning of the file */
-    rewind(inFilePtr);
+        rewind(inFilePtr);
 
     /* after doing a readAndParse, you may want to do the following to test the
         opcode */
     if (!strcmp(opcode, "add")) {
         /* do whatever you need to do for opcode "add" */
+        int op = 0b000;
+        int wr;
+        wr = toRType(label, op, arg0, arg1, arg2);
+        fprintf(outFilePtr, "%d", wr);
     }
-
+    if (!strcmp(opcode, "nand")) {
+        /* do whatever you need to do for opcode "nand" */
+        int op = 0b001;
+        int wr = 0;
+        wr = toRType(label, op, arg0, arg1, arg2);
+        fprintf(outFilePtr, "%d", wr);
+    }
     return(0);
 }
 
@@ -80,7 +92,6 @@ int readAndParse(FILE *inFilePtr, char *label, char *opcode, char *arg0,
 	/* reached end of file */
         return(0);
     }
-
     /* check for line too long (by looking for a \n) */
     if (strchr(line, '\n') == NULL) {
         /* line too long */
@@ -101,12 +112,7 @@ int readAndParse(FILE *inFilePtr, char *label, char *opcode, char *arg0,
      */
     sscanf(ptr, "%*[\t\n ]%[^\t\n ]%*[\t\n ]%[^\t\n ]%*[\t\n ]%[^\t\n ]%*[\t\n ]%[^\t\n ]",
         opcode, arg0, arg1, arg2);
-    
-    printf("%s",label);
-    printf("%s",opcode);
-    printf("%s",arg0);
-    printf("%s",arg1);
-    printf("%s",arg2);
+
     return(1);
 }
 
@@ -115,4 +121,16 @@ int isNumber(char *string)
     /* return 1 if string is a number */
     int i;
     return( (sscanf(string, "%d", &i)) == 1);
+}
+
+int toRType(char *label, int opcode, char *arg0,
+    char *arg1, char *arg2){
+        int instr = 0b0;
+        // convert arg to binary
+        int arg0B = atoi (arg0);
+        int arg1B = atoi (arg1);
+        int arg2B = atoi (arg2);
+        // place arguments into instruction
+        instr = ((((((((instr << 3) + opcode) << 3) + arg0B) << 3) + arg1B) << 16) + arg2B); 
+    return instr;
 }
