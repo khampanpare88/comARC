@@ -10,6 +10,7 @@ int readAndParse(FILE *, char *, char *, char *, char *, char *);
 int findaddress( char *,char *);
 int isNumber(char *);
 int toRType(char *, int, char *, char *, char *);
+int toIType(char *, int, char *, char *, char *);
 int toOType(int);
 int toJType(char *, int, char *, char *, int);
 int instrcheck(FILE *);
@@ -88,6 +89,29 @@ int main(int argc, char *argv[])
         if (!strcmp(opcode, "noop")) {
             int op = 0b111;
             int wr = toOType(op);
+            fprintf(outFilePtr, "%d", wr);
+        }
+        if (!strcmp(opcode, "lw")) {
+        /* do whatever you need to do for opcode "lw" */
+        int op = 0b010;
+        int wr = 0;
+        wr = toIType(label, op, arg0, arg1, arg2);
+        fprintf(outFilePtr, "%d", wr);
+        }
+
+        if (!strcmp(opcode, "sw")) {
+            /* do whatever you need to do for opcode "sw" */
+            int op = 0b011;
+            int wr = 0;
+            wr = toIType(label, op, arg0, arg1, arg2);
+            fprintf(outFilePtr, "%d", wr);
+        }
+
+        if (!strcmp(opcode, "beq")) {
+            /* do whatever you need to do for opcode "deq" */
+            int op = 0b100;
+            int wr = 0;
+            wr = toIType(label, op, arg0, arg1, arg2);
             fprintf(outFilePtr, "%d", wr);
         }
         fprintf(outFilePtr,"%s","\n");
@@ -203,5 +227,84 @@ int toJType(char *label, int opcode, char *arg0,
         int arg1B = atoi (arg1);
         // place arguments into instruction
         instr = ((((((((instr << 3) + opcode) << 3) + arg0B) << 3) + arg1B) << 16) + arg2); 
+    return instr;
+}
+
+int toIType(char *label, int opcode, char *arg0,
+    char *arg1, char *arg2){
+        int instr = 0b0;
+        // convert arg to binary
+        int arg0B = atoi (arg0);
+        int arg1B = atoi (arg1);
+        // 2'complement
+        int arg2B = atoi (arg2);
+        if(arg2B > -32768 && arg2B < 32767){
+            if(arg2B < 0){
+                int temp = fabs(arg2B);
+                int binary[16];
+                    //แปลงเป็นฐาน2แล้วกลับบิต
+                    for(int i=0; i<16; i++){
+                        binary[i]=(temp % 2);
+                        temp = temp/2;
+                        if(binary[i] == 1){
+                            binary[i] = 0;
+                        }
+                        else{
+                            binary[i] = 1;
+                        }
+                    }
+                    int carry = 1;                        
+                    int carryin = 0;
+                    //+1 ที่บิตสุดท้าย
+                    if(binary[0] == 1 && carry == 1){
+                        binary[0] = 0;
+                        carryin = 1;
+                        for(int m=1;m<16;m++){
+                            if(binary[m] == 1 && carryin == 1){
+                                binary[m] = 0;
+                                carryin = 1;
+                            }
+                            else if (binary[m] == 0 && carryin == 1){
+                                binary[m] = 1;
+                                carryin = 0;
+                            }
+                            else{
+                                binary[m] = binary[m];
+                            }
+                        }
+                    }
+                    else if(binary[0]==0 && carry == 1){
+                        binary[0] = 1;
+                        carryin = 0;
+                        for(int m=1;m<16;m++){
+                            if(binary[m]==1 && carryin == 1){
+                                binary[m] = 0;
+                                carryin = 1;
+                            }
+                            else if (binary[m] == 0 && carryin == 1){
+                                binary[m] = 1;
+                                carryin = 0;
+                            }
+                            else{
+                                binary[m] = binary[m];
+                            }
+                        }
+                    }
+                    //ทำเป็นฐาน10
+                    arg2B = 0;
+                    for(int n=0;n<16;n++){
+                        binary[n] = binary[n]*pow(2,n);
+                        arg2B = arg2B + binary[n];
+                    }
+            }
+            else{
+                arg2B = arg2B;
+            }   
+        }
+        else{
+            printf("error: offsetField\n");
+        }
+        // place arguments into instruction
+        instr = ((((((((instr << 3) + opcode) << 3) + arg0B) << 3) + arg1B) << 16) + arg2B);
     return instr;
 }
