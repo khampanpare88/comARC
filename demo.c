@@ -53,7 +53,6 @@ int main(int argc, char *argv[])
         int wr = 0;
         int arg2 = 0b0000000000000000;
         wr = toJType(label, op, arg0, arg1, arg2);
-        printf("%d",wr);
         fprintf(outFilePtr, "%d", wr);
         }
 
