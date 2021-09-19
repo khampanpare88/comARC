@@ -9,6 +9,7 @@
 int readAndParse(FILE *, char *, char *, char *, char *, char *);
 int isNumber(char *);
 int toRType(char *, int, char *, char *, char *);
+int toOType(int);
 int instrcheck(FILE *);
 int main(int argc, char *argv[])
 {
@@ -62,6 +63,16 @@ int main(int argc, char *argv[])
         int op = 0b001;
         int wr = 0;
         wr = toRType(label, op, arg0, arg1, arg2);
+        fprintf(outFilePtr, "%d", wr);
+    }
+    if (!strcmp(opcode, "halt")) {
+        int op = 0b110;
+        int wr = toOType(op);
+        fprintf(outFilePtr, "%d", wr);
+    }
+    if (!strcmp(opcode, "noop")) {
+        int op = 0b111;
+        int wr = toOType(op);
         fprintf(outFilePtr, "%d", wr);
     }
     return(0);
@@ -132,5 +143,10 @@ int toRType(char *label, int opcode, char *arg0,
         int arg2B = atoi (arg2);
         // place arguments into instruction
         instr = ((((((((instr << 3) + opcode) << 3) + arg0B) << 3) + arg1B) << 16) + arg2B); 
+    return instr;
+}
+
+int toOType(int opcode){
+    int instr = opcode << 22;
     return instr;
 }
