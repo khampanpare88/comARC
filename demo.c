@@ -7,14 +7,15 @@
 #define MAXLINELENGTH 1000
 
 int readAndParse(FILE *, char *, char *, char *, char *, char *);
+int findaddress( char *,char *);
 int isNumber(char *);
 int toRType(char *, int, char *, char *, char *);
 int toOType(int);
 int instrcheck(FILE *);
 int main(int argc, char *argv[])
 {
-    char *inFileString, *outFileString;
-    FILE *inFilePtr, *outFilePtr;
+    char *inFileString, *outFileString,*checkinFileString;
+    FILE *inFilePtr, *outFilePtr,*checkinFile;
     char label[MAXLINELENGTH], opcode[MAXLINELENGTH], arg0[MAXLINELENGTH],
             arg1[MAXLINELENGTH], arg2[MAXLINELENGTH];
 
@@ -41,15 +42,17 @@ int main(int argc, char *argv[])
 
     /* here is an example for how to use readAndParse to read a line from
         inFilePtr */
-    int onijang=0;
-    while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
+
+    while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)) {
         /* reached end of file */
         if (!strcmp(opcode, ".fill")) {
             if(isNumber(arg0)==1){
                 int wr = atoi(arg0);
                 fprintf(outFilePtr, "%d", wr);
             }else{
-
+                const char *target=arg0;
+                int wr=findaddress(argv[1],arg0);
+                fprintf(outFilePtr, "%d", wr);
             }
         }
         if (!strcmp(opcode, "add")) {
@@ -77,7 +80,6 @@ int main(int argc, char *argv[])
             fprintf(outFilePtr, "%d", wr);
         }
         fprintf(outFilePtr,"%s","\n");
-        onijang++;
     }
 
     /* this is how to rewind the file ptr so that you start reading from the
@@ -163,4 +165,21 @@ int toOType(int opcode){
     return instr;
 }
 
-
+int findaddress(char *arg, char *target){
+        int address=0;
+            char label[MAXLINELENGTH], opcode[MAXLINELENGTH], arg0[MAXLINELENGTH],
+            arg1[MAXLINELENGTH], arg2[MAXLINELENGTH];
+        FILE *FilePtr;
+        char *FileString = arg; 
+        FilePtr = fopen(FileString, "r");
+        while (readAndParse(FilePtr, label, opcode, arg0, arg1, arg2)){
+            if(!strcmp (target,label)){
+                //printf("%s\n",target);
+               // printf("%s\n",label);
+               // printf("%d same!!\n",address);
+                return address;
+            }
+            //printf("not\n");
+            address++;
+        }
+}
