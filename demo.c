@@ -11,6 +11,7 @@ int findaddress( char *,char *);
 int isNumber(char *);
 int toRType(char *, int, char *, char *, char *);
 int toOType(int);
+int toJType(char *, int, char *, char *, int);
 int instrcheck(FILE *);
 int main(int argc, char *argv[])
 {
@@ -45,6 +46,16 @@ int main(int argc, char *argv[])
 
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)) {
         /* reached end of file */
+        if (!strcmp(opcode, "jalr")) {
+         /*do whatever you need to do for opcode "jalr" */
+        int op = 0b101;
+        int wr = 0;
+        int arg2 = 0b0000000000000000;
+        wr = toJType(label, op, arg0, arg1, arg2);
+        printf("%d",wr);
+        fprintf(outFilePtr, "%d", wr);
+        }
+
         if (!strcmp(opcode, ".fill")) {
             if(isNumber(arg0)==1){
                 int wr = atoi(arg0);
@@ -182,4 +193,15 @@ int findaddress(char *arg, char *target){
             //printf("not\n");
             address++;
         }
+}
+
+int toJType(char *label, int opcode, char *arg0,
+    char *arg1, int arg2){
+        int instr = 0b0;
+        // convert arg to binary
+        int arg0B = atoi (arg0);
+        int arg1B = atoi (arg1);
+        // place arguments into instruction
+        instr = ((((((((instr << 3) + opcode) << 3) + arg0B) << 3) + arg1B) << 16) + arg2); 
+    return instr;
 }
