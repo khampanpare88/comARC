@@ -59,16 +59,22 @@ int main(int argc, char *argv[])
 
     initialState(&state);
 
+    instrStruct instrArr[state.numMemory];
+    
     int binary[32];
-    toBinary(&binary, state.mem[0]);
-    initialInstr(binary, &instrCode);
-    printf("========== instruction check ========== \n");
-    printf("opcode = %d\n", instrCode.opcode);
-    printf("arg0 = %d\n", instrCode.arg0);
-    printf("arg1 = %d\n", instrCode.arg1);
-    printf("arg2 = %d\n", instrCode.arg2);
-    printf("======================================= \n");
-    printState(&state);
+    for(int i = 0;i < state.numMemory;i++){
+        toBinary(&binary, state.mem[i]);
+        initialInstr(binary, &instrCode);
+        instrArr[i] = instrCode;
+        // printf("========== instruction check ========== \n");
+        // printf("opcode = %d\n", instrArr[i].opcode);
+        // printf("arg0 = %d\n", instrArr[i].arg0);
+        // printf("arg1 = %d\n", instrArr[i].arg1);
+        // printf("arg2 = %d\n", instrArr[i].arg2);
+        // printf("======================================= \n");
+        // printState(&state);
+    }
+    
     return(0);
 }
 
