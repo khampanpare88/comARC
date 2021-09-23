@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
+#include <math.h>
 #define MAXLINELENGTH 1000
 
 int readAndParse(FILE *, char *, char *, char *, char *, char *);
@@ -13,7 +13,9 @@ int toRType(char *, int, char *, char *, char *);
 int toIType(char *, int, char *, char *, char *);
 int toOType(int);
 int toJType(char *, int, char *, char *, int);
-int instrcheck(FILE *);
+void opCodeCheck(char *);
+void labelCheck(char *, char *);
+
 int main(int argc, char *argv[])
 {
     char *inFileString, *outFileString,*checkinFileString;
@@ -47,17 +49,20 @@ int main(int argc, char *argv[])
 
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)) {
         /* reached end of file */
+        if(strlen(label)!=0){
+            labelCheck(argv[1], label);
+        }
+        opCodeCheck(opcode);
         if (!strcmp(opcode, "jalr")) {
-         /*do whatever you need to do for opcode "jalr" */
+         /*do whatever you need to do for opcode "jalr" */ 
         int op = 0b101;
         int wr = 0;
         int arg2 = 0b0000000000000000;
         wr = toJType(label, op, arg0, arg1, arg2);
         fprintf(outFilePtr, "%d", wr);
         }
-
         if (!strcmp(opcode, ".fill")) {
-            if(isNumber(arg0)==1){
+            if(isNumber(arg0)){
                 int wr = atoi(arg0);
                 fprintf(outFilePtr, "%d", wr);
             }else{
@@ -201,21 +206,49 @@ int toOType(int opcode){
 
 int findaddress(char *arg, char *target){
         int address=0;
-            char label[MAXLINELENGTH], opcode[MAXLINELENGTH], arg0[MAXLINELENGTH],
+        char label[MAXLINELENGTH], opcode[MAXLINELENGTH], arg0[MAXLINELENGTH],
             arg1[MAXLINELENGTH], arg2[MAXLINELENGTH];
         FILE *FilePtr;
         char *FileString = arg; 
+        int count;
         FilePtr = fopen(FileString, "r");
         while (readAndParse(FilePtr, label, opcode, arg0, arg1, arg2)){
             if(!strcmp (target,label)){
-                //printf("%s\n",target);
-               // printf("%s\n",label);
-               // printf("%d same!!\n",address);
                 return address;
             }
-            //printf("not\n");
             address++;
         }
+}
+
+void labelCheck(char *arg, char *tempCheck){
+    char label[MAXLINELENGTH], opcode[MAXLINELENGTH], arg0[MAXLINELENGTH],
+            arg1[MAXLINELENGTH], arg2[MAXLINELENGTH];
+    FILE *FilePtr;
+    char *FileString = arg; 
+    FilePtr = fopen(FileString, "r");
+        while (readAndParse(FilePtr, label, opcode, arg0, arg1, arg2)){
+            if(!strcmp (tempCheck,label)){
+                printf("error: duplicated lable!\n");
+                printf("error at : %s", tempCheck);
+                exit(1);
+            }
+        }
+}
+
+void opCodeCheck(char *opcodeCheck){
+   // printf("op = %s t/f = %d", opcodeCheck, strcmp(opcodeCheck, "lw") && 273);
+    if( strcmp(opcodeCheck, "add") &&
+        strcmp(opcodeCheck, "nand") &&
+        strcmp(opcodeCheck, "lw") &&
+        strcmp(opcodeCheck, "sw") &&
+        strcmp(opcodeCheck, "beq") &&
+        strcmp(opcodeCheck, "jalr") &&
+        strcmp(opcodeCheck, "halt") &&
+        strcmp(opcodeCheck, "noop") &&
+        strcmp(opcodeCheck, ".fill")){
+            printf("error: restricted opcode\n");
+            exit(1);
+    }
 }
 
 int toJType(char *label, int opcode, char *arg0,
@@ -302,6 +335,7 @@ int toIType(char *label, int opcode, char *arg0,
         }
         else{
             printf("error: offsetField\n");
+            exit(1);
         }
         // place arguments into instruction
         instr = ((((((((instr << 3) + opcode) << 3) + arg0B) << 3) + arg1B) << 16) + arg2B);
