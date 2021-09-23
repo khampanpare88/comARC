@@ -4,10 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-<<<<<<< HEAD
-=======
-
->>>>>>> 359d1da787ad3bf6d2a8218451f0d20aa5ff8d8d
 #define MAXLINELENGTH 1000
 
 int readAndParse(FILE *, char *, char *, char *, char *, char *);
@@ -52,7 +48,6 @@ int main(int argc, char *argv[])
         inFilePtr */
     int lineNumber = 0;
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)) {
-        /* reached end of file */
         if(strlen(label)!=0){
             labelCheck(argv[1], label);
         }
@@ -223,20 +218,28 @@ int findaddress(char *arg, char *target){
             }
             address++;
         }
+        printf("error: undefined label\n");
+        exit(1);
+        return 0;
 }
 
 void labelCheck(char *arg, char *tempCheck){
-    char label[MAXLINELENGTH], opcode[MAXLINELENGTH], arg0[MAXLINELENGTH],
-            arg1[MAXLINELENGTH], arg2[MAXLINELENGTH];
+    char labelT[MAXLINELENGTH], opcodeT[MAXLINELENGTH], arg0T[MAXLINELENGTH],
+            arg1T[MAXLINELENGTH], arg2T[MAXLINELENGTH];
     FILE *FilePtr;
     char *FileString = arg; 
+    int flag = 0;
     FilePtr = fopen(FileString, "r");
-        while (readAndParse(FilePtr, label, opcode, arg0, arg1, arg2)){
-            if(!strcmp (tempCheck,label)){
-                printf("error: duplicated lable!\n");
-                printf("error at : %s", tempCheck);
-                exit(1);
+        while (readAndParse(FilePtr, labelT, opcodeT, arg0T, arg1T, arg2T)){
+          //  printf("checking Line :\n");
+        //    printf("label = %s , op = %s , arg0 = %s , arg1 = %s , arg2 = %s \n", labelT, opcodeT,arg0T,arg1T,arg2T);
+            if(!strcmp (tempCheck,labelT)){
+                flag++;
             }
+        }
+        if(flag > 1){
+            printf("error: duplicated label\n");
+            exit(1);
         }
 }
 
@@ -284,7 +287,6 @@ int toIType(char *label, int opcode, char *arg0,
             //labelv = findaddress(argv,);
             /*
             arg2B = arg2B-labelv;
-           
             printf("%d \n",labelv);*/
             arg2B = findaddress(argv,arg2);
             arg2B = arg2B - lineNumber;
@@ -353,17 +355,10 @@ int toIType(char *label, int opcode, char *arg0,
                     arg2B = arg2B;
                 }
             }   
-<<<<<<< HEAD
-        }
-        else{
-            printf("error: offsetField\n");
-            exit(1);
-        }
-=======
             else{
                 printf("error: offsetField\n");
+                exit(1);
             }
->>>>>>> 359d1da787ad3bf6d2a8218451f0d20aa5ff8d8d
         // place arguments into instruction
         instr = ((((((((instr << 3) + opcode) << 3) + arg0B) << 3) + arg1B) << 16) + arg2B);
     return instr;
