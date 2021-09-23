@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
     initialState(&state);
 
     instrStruct instrArr[state.numMemory];
-    
+
     int binary[32];
     for(int i = 0;i < state.numMemory;i++){
         toBinary(&binary, state.mem[i]);
@@ -99,6 +99,7 @@ void initialState(stateType *state){
     for(int i = 0; i < 8; i++){
         state->reg[i] = 0;
     }
+    printState(state);
 }
 
 void toBinary(int *binary, int assembly){
