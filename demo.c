@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
             /* do whatever you need to do for opcode "deq" */
             int op = 0b100;
             int wr = 0;
-            wr = toIType(label, op, arg0, arg1, arg2, argv[1], lineNumber);
+            wr = toIType(label, op, arg0, arg1, arg2, argv[1], lineNumber+1);
             fprintf(outFilePtr, "%d", wr);
         }
         fprintf(outFilePtr,"%s","\n");
