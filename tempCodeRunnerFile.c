@@ -4,17 +4,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-<<<<<<< HEAD
-=======
-
->>>>>>> 359d1da787ad3bf6d2a8218451f0d20aa5ff8d8d
 #define MAXLINELENGTH 1000
 
 int readAndParse(FILE *, char *, char *, char *, char *, char *);
 int findaddress( char *,char *);
 int isNumber(char *);
 int toRType(char *, int, char *, char *, char *);
-int toIType(char *, int, char *, char *, char *, char *, int);
+int toIType(char *, int, char *, char *, char *);
 int toOType(int);
 int toJType(char *, int, char *, char *, int);
 void opCodeCheck(char *);
@@ -50,7 +46,7 @@ int main(int argc, char *argv[])
 
     /* here is an example for how to use readAndParse to read a line from
         inFilePtr */
-    int lineNumber = 0;
+
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)) {
         /* reached end of file */
         if(strlen(label)!=0){
@@ -103,7 +99,7 @@ int main(int argc, char *argv[])
         /* do whatever you need to do for opcode "lw" */
         int op = 0b010;
         int wr = 0;
-        wr = toIType(label, op, arg0, arg1, arg2, argv[1], lineNumber);
+        wr = toIType(label, op, arg0, arg1, arg2);
         fprintf(outFilePtr, "%d", wr);
         }
 
@@ -111,7 +107,7 @@ int main(int argc, char *argv[])
             /* do whatever you need to do for opcode "sw" */
             int op = 0b011;
             int wr = 0;
-            wr = toIType(label, op, arg0, arg1, arg2, argv[1], lineNumber);
+            wr = toIType(label, op, arg0, arg1, arg2);
             fprintf(outFilePtr, "%d", wr);
         }
 
@@ -119,11 +115,10 @@ int main(int argc, char *argv[])
             /* do whatever you need to do for opcode "deq" */
             int op = 0b100;
             int wr = 0;
-            wr = toIType(label, op, arg0, arg1, arg2, argv[1], lineNumber);
+            wr = toIType(label, op, arg0, arg1, arg2);
             fprintf(outFilePtr, "%d", wr);
         }
         fprintf(outFilePtr,"%s","\n");
-        lineNumber++;
     }
 
     /* this is how to rewind the file ptr so that you start reading from the
@@ -268,31 +263,17 @@ int toJType(char *label, int opcode, char *arg0,
 }
 
 int toIType(char *label, int opcode, char *arg0,
-    char *arg1, char *arg2, char *argv, int lineNumber){
+    char *arg1, char *arg2){
         int instr = 0b0;
         // convert arg to binary
         int arg0B = atoi (arg0);
         int arg1B = atoi (arg1);
         // 2'complement
-        int arg2B;
-        int labelv;
-        //printf("%d \n",arg2);
-        if(isNumber(arg2) == 1){
-            arg2B = atoi (arg2);
-        }
-        else{
-            //labelv = findaddress(argv,);
-            /*
-            arg2B = arg2B-labelv;
-           
-            printf("%d \n",labelv);*/
-            arg2B = findaddress(argv,arg2);
-            arg2B = arg2B - lineNumber;
-        }
+        int arg2B = atoi (arg2);
         if(arg2B > -32768 && arg2B < 32767){
-                if(arg2B < 0){
-                    int temp = fabs(arg2B);
-                    int binary[16];
+            if(arg2B < 0){
+                int temp = fabs(arg2B);
+                int binary[16];
                     //แปลงเป็นฐาน2แล้วกลับบิต
                     for(int i=0; i<16; i++){
                         binary[i]=(temp % 2);
@@ -307,7 +288,6 @@ int toIType(char *label, int opcode, char *arg0,
                     int carry = 1;                        
                     int carryin = 0;
                     //+1 ที่บิตสุดท้าย
-                    
                     if(binary[0] == 1 && carry == 1){
                         binary[0] = 0;
                         carryin = 1;
@@ -348,22 +328,15 @@ int toIType(char *label, int opcode, char *arg0,
                         binary[n] = binary[n]*pow(2,n);
                         arg2B = arg2B + binary[n];
                     }
-                }
-                else{
-                    arg2B = arg2B;
-                }
+            }
+            else{
+                arg2B = arg2B;
             }   
-<<<<<<< HEAD
         }
         else{
             printf("error: offsetField\n");
             exit(1);
         }
-=======
-            else{
-                printf("error: offsetField\n");
-            }
->>>>>>> 359d1da787ad3bf6d2a8218451f0d20aa5ff8d8d
         // place arguments into instruction
         instr = ((((((((instr << 3) + opcode) << 3) + arg0B) << 3) + arg1B) << 16) + arg2B);
     return instr;
