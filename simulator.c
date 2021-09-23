@@ -63,3 +63,12 @@ void printState(stateType *statePtr)
 	}
     printf("end state\n");
 }
+
+ int convertNum(int num)
+{
+    /* convert a 16-bit number into a 32-bit integer */
+    if (num & (1<<15) ) {
+        num -= (1<<16);
+    }
+    return(num);
+}
