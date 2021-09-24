@@ -13,7 +13,7 @@ typedef struct stateStruct {
     int pc;
     int mem[NUMMEMORY];
     int reg[NUMREGS];
-    int numMemory;
+    int numMemory; 
 } stateType;
 
 typedef struct instrStruct {
