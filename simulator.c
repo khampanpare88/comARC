@@ -27,6 +27,8 @@ void printState(stateType *);
 void initialState(stateType *);
 void toBinary(int *, int);
 void initialInstr(int *, instrStruct *);
+void lw(instrStruct,stateType *);
+void sw(instrStruct,stateType *);
 
 int main(int argc, char *argv[])
 {
@@ -59,16 +61,59 @@ int main(int argc, char *argv[])
 
     initialState(&state);
 
+    instrStruct instrArr[state.numMemory];
+
     int binary[32];
-    toBinary(&binary, state.mem[0]);
-    initialInstr(binary, &instrCode);
-    printf("========== instruction check ========== \n");
-    printf("opcode = %d\n", instrCode.opcode);
-    printf("arg0 = %d\n", instrCode.arg0);
-    printf("arg1 = %d\n", instrCode.arg1);
-    printf("arg2 = %d\n", instrCode.arg2);
-    printf("======================================= \n");
-    printState(&state);
+    for(int i = 0;i < state.numMemory;i++){
+        toBinary(&binary, state.mem[i]);
+        initialInstr(binary, &instrCode);
+        instrArr[i] = instrCode;
+        // printf("========== instruction check ========== \n");
+        // printf("opcode = %d\n", instrArr[i].opcode);
+        // printf("arg0 = %d\n", instrArr[i].arg0);
+        // printf("arg1 = %d\n", instrArr[i].arg1);
+        // printf("arg2 = %d\n", instrArr[i].arg2);
+        // printf("======================================= \n");
+        // printState(&state);
+
+        switch (instrArr[i].opcode)
+        {
+        case 0:
+            //add
+            break;
+        case 1:
+            //nand
+            break;
+        case 2:
+            //lw
+            lw(instrArr[i],&state);
+            break;
+        case 3:
+            //sw
+            sw(instrArr[i],&state);
+            break;
+        case 4:
+            //beq
+            break;
+        case 5:
+            //jalr
+            break;
+        case 6:
+            //halt
+            break;
+        case 7:
+            //noop
+            break;
+        
+        default:
+            exit(1);
+            break;
+        }
+        
+    }
+    // lw(instrArr[0],&state);
+    // lw(instrArr[1],&state);
+
     return(0);
 }
 
@@ -93,6 +138,7 @@ void initialState(stateType *state){
     for(int i = 0; i < 8; i++){
         state->reg[i] = 0;
     }
+    printState(state);
 }
 
 void toBinary(int *binary, int assembly){
@@ -182,4 +228,20 @@ void initialInstr(int *binary,instrStruct *instr){
                     instr->arg2 = 0;
                     break;
     }
+}
+
+void lw(instrStruct instr,stateType *state){
+    int memAddr;
+    memAddr = instr.arg2 + state->reg[instr.arg0];
+    state->reg[instr.arg1] = state->mem[memAddr];
+    state->pc++;
+    printState(state);
+}
+
+void sw(instrStruct instr,stateType *state){
+    int memAddr;
+    memAddr = instr.arg2 + state->reg[instr.arg1];
+    state->reg[instr.arg0] = state->mem[memAddr];
+    state->pc++;
+    printState(state);
 }
