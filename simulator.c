@@ -13,7 +13,7 @@ typedef struct stateStruct {
     int pc;
     int mem[NUMMEMORY];
     int reg[NUMREGS];
-    int numMemory; 
+    int numMemory;
 } stateType;
 
 typedef struct instrStruct {
@@ -29,6 +29,7 @@ void toBinary(int *, int);
 void initialInstr(int *, instrStruct *);
 void lw(instrStruct,stateType *);
 void sw(instrStruct,stateType *);
+void beq(instrStruct,stateType *);
 void add(instrStruct,stateType *);
 void nand(instrStruct,stateType *);
 
@@ -66,55 +67,62 @@ int main(int argc, char *argv[])
     instrStruct instrArr[state.numMemory];
 
     int binary[32];
-    for(int i = 0;i < state.numMemory;i++){
-        toBinary(&binary, state.mem[i]);
+    while(state.pc < state.numMemory){
+        toBinary(&binary, state.mem[state.pc]);
         initialInstr(binary, &instrCode);
-        instrArr[i] = instrCode;
+        instrArr[state.pc] = instrCode;
         // printf("========== instruction check ========== \n");
         // printf("opcode = %d\n", instrArr[i].opcode);
         // printf("arg0 = %d\n", instrArr[i].arg0);
         // printf("arg1 = %d\n", instrArr[i].arg1);
         // printf("arg2 = %d\n", instrArr[i].arg2);
         // printf("======================================= \n");
+        // printState(&state);
 
-        switch (instrArr[i].opcode)
+        switch (instrArr[state.pc].opcode)
         {
         case 0:
             //add
-            if(instrArr[i].arg0 != 0 && instrArr[i].arg1 != 0){
-            add(instrArr[i],&state);
-            }
+            if(instrArr[state.pc].arg0 != 0 && instrArr[state.pc].arg1 != 0){
+            add(instrArr[state.pc],&state);}
+
             break;
         case 1:
             //nand
-            nand(instrArr[i],&state);
+            nand(instrArr[state.pc],&state);
             break;
         case 2:
             //lw
-            lw(instrArr[i],&state);
+            lw(instrArr[state.pc],&state);
+            
             break;
         case 3:
             //sw
-            sw(instrArr[i],&state);
+            sw(instrArr[state.pc],&state);
+            
             break;
         case 4:
             //beq
+            beq(instrArr[state.pc],&state);
             break;
         case 5:
             //jalr
+            state.pc++;
             break;
         case 6:
             //halt
+            state.pc++;
             break;
         case 7:
             //noop
+            state.pc++;
             break;
         
         default:
             exit(1);
             break;
         }
-        
+
     }
     // lw(instrArr[0],&state);
     // lw(instrArr[1],&state);
@@ -249,6 +257,18 @@ void sw(instrStruct instr,stateType *state){
     state->reg[instr.arg0] = state->mem[memAddr];
     state->pc++;
     printState(state);
+}
+
+void beq(instrStruct instr,stateType *state){
+    int address;
+    address = state->pc + 1 + instr.arg2;
+    if(state->reg[instr.arg0] == state->reg[instr.arg1]){
+        state->pc = address;
+        printState(state);
+    }else{
+        state->pc++;
+        printState(state);
+    }
 }
 
 void add(instrStruct instr,stateType *state){
