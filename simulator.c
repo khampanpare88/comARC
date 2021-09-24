@@ -27,6 +27,8 @@ void printState(stateType *);
 void initialState(stateType *);
 void toBinary(int *, int);
 void initialInstr(int *, instrStruct *);
+void lw(instrStruct,stateType *);
+void sw(instrStruct,stateType *);
 
 int main(int argc, char *argv[])
 {
@@ -73,8 +75,45 @@ int main(int argc, char *argv[])
         // printf("arg2 = %d\n", instrArr[i].arg2);
         // printf("======================================= \n");
         // printState(&state);
+
+        switch (instrArr[i].opcode)
+        {
+        case 0:
+            //add
+            break;
+        case 1:
+            //nand
+            break;
+        case 2:
+            //lw
+            lw(instrArr[i],&state);
+            break;
+        case 3:
+            //sw
+            sw(instrArr[i],&state);
+            break;
+        case 4:
+            //beq
+            break;
+        case 5:
+            //jalr
+            break;
+        case 6:
+            //halt
+            break;
+        case 7:
+            //noop
+            break;
+        
+        default:
+            exit(1);
+            break;
+        }
+        
     }
-    
+    // lw(instrArr[0],&state);
+    // lw(instrArr[1],&state);
+
     return(0);
 }
 
@@ -189,4 +228,20 @@ void initialInstr(int *binary,instrStruct *instr){
                     instr->arg2 = 0;
                     break;
     }
+}
+
+void lw(instrStruct instr,stateType *state){
+    int memAddr;
+    memAddr = instr.arg2 + state->reg[instr.arg0];
+    state->reg[instr.arg1] = state->mem[memAddr];
+    state->pc++;
+    printState(state);
+}
+
+void sw(instrStruct instr,stateType *state){
+    int memAddr;
+    memAddr = instr.arg2 + state->reg[instr.arg1];
+    state->reg[instr.arg0] = state->mem[memAddr];
+    state->pc++;
+    printState(state);
 }
