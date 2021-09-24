@@ -29,6 +29,8 @@ void toBinary(int *, int);
 void initialInstr(int *, instrStruct *);
 void lw(instrStruct,stateType *);
 void sw(instrStruct,stateType *);
+void add(instrStruct,stateType *);
+void nand(instrStruct,stateType *);
 
 int main(int argc, char *argv[])
 {
@@ -74,15 +76,18 @@ int main(int argc, char *argv[])
         // printf("arg1 = %d\n", instrArr[i].arg1);
         // printf("arg2 = %d\n", instrArr[i].arg2);
         // printf("======================================= \n");
-        // printState(&state);
 
         switch (instrArr[i].opcode)
         {
         case 0:
             //add
+            if(instrArr[i].arg0 != 0 && instrArr[i].arg1 != 0){
+            add(instrArr[i],&state);
+            }
             break;
         case 1:
             //nand
+            nand(instrArr[i],&state);
             break;
         case 2:
             //lw
@@ -242,6 +247,24 @@ void sw(instrStruct instr,stateType *state){
     int memAddr;
     memAddr = instr.arg2 + state->reg[instr.arg1];
     state->reg[instr.arg0] = state->mem[memAddr];
+    state->pc++;
+    printState(state);
+}
+
+void add(instrStruct instr,stateType *state){
+    int sum;
+    sum = state->reg[instr.arg0] + state->reg[instr.arg1];
+    state->reg[instr.arg2] = sum;
+    state->pc++;
+    printState(state);
+}
+
+void nand(instrStruct instr,stateType *state){
+    int nand;
+    int arg0T = state->reg[instr.arg0];
+    int arg1T = state->reg[instr.arg1];
+    nand = !((arg0T%2)*(arg1T%2))*1 + !(((arg0T/2)%2)*((arg1T/2)%2))*2 + !(((arg0T/4)%2)*((arg1T/4)%2))*4;
+    state->reg[instr.arg2] = nand;
     state->pc++;
     printState(state);
 }
