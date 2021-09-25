@@ -1,5 +1,3 @@
-/* instruction-level simulator */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
