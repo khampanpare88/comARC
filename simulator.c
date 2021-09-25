@@ -32,6 +32,8 @@ void sw(instrStruct,stateType *);
 void beq(instrStruct,stateType *);
 void add(instrStruct,stateType *);
 void nand(instrStruct,stateType *);
+void lair(instrStruct,stateType *);
+void halt(instrStruct,stateType *,int);
 
 int main(int argc, char *argv[])
 {
@@ -67,6 +69,7 @@ int main(int argc, char *argv[])
     instrStruct instrArr[state.numMemory];
 
     int binary[32];
+    int i =0;
     while(state.pc < state.numMemory){
         toBinary(&binary, state.mem[state.pc]);
         initialInstr(binary, &instrCode);
@@ -78,7 +81,7 @@ int main(int argc, char *argv[])
         // printf("arg2 = %d\n", instrArr[i].arg2);
         // printf("======================================= \n");
         // printState(&state);
-
+        i++;
         switch (instrArr[state.pc].opcode)
         {
         case 0:
@@ -107,11 +110,11 @@ int main(int argc, char *argv[])
             break;
         case 5:
             //jalr
-            state.pc++;
+            jalr(instrArr[state.pc],&state);
             break;
         case 6:
             //halt
-            state.pc++;
+            halt(instrArr[state.pc],&state, i);
             break;
         case 7:
             //noop
@@ -126,7 +129,6 @@ int main(int argc, char *argv[])
     }
     // lw(instrArr[0],&state);
     // lw(instrArr[1],&state);
-
     return(0);
 }
 
@@ -286,5 +288,32 @@ void nand(instrStruct instr,stateType *state){
     nand = !((arg0T%2)*(arg1T%2))*1 + !(((arg0T/2)%2)*((arg1T/2)%2))*2 + !(((arg0T/4)%2)*((arg1T/4)%2))*4;
     state->reg[instr.arg2] = nand;
     state->pc++;
+    printState(state);
+}
+
+void jalr(instrStruct instr,stateType *state){
+    int address;
+    int arg0T = state->reg[instr.arg0]; //rA
+    int arg1T = state->reg[instr.arg1]; //rB
+    address = state->pc+1;
+    state->reg[instr.arg1] = address; //save pc+1 --> rB
+    if(state->reg[instr.arg1] != state->reg[instr.arg0]){
+        state->pc = state->reg[instr.arg1]; //jump rA(add)
+    }
+    else {
+        // jump pc+1
+        state->pc = address;
+    }
+    state->pc++;
+    printState(state);
+}
+
+void halt(instrStruct instr,stateType *state, int i){
+    state->pc++;
+    printf("machine halted \n");
+    printf("total of ");
+    printf("%d",i);
+    printf(" instructions executed \n");
+    printf("final state of machine");
     printState(state);
 }
