@@ -13,7 +13,7 @@ typedef struct stateStruct {
     int pc;
     int mem[NUMMEMORY];
     int reg[NUMREGS];
-    int numMemory; 
+    int numMemory;
 } stateType;
 
 typedef struct instrStruct {
@@ -29,8 +29,11 @@ void toBinary(int *, int);
 void initialInstr(int *, instrStruct *);
 void lw(instrStruct,stateType *);
 void sw(instrStruct,stateType *);
+void beq(instrStruct,stateType *);
 void add(instrStruct,stateType *);
 void nand(instrStruct,stateType *);
+void jalr(instrStruct,stateType *);
+void halt(instrStruct,stateType *,int,int *);
 
 int main(int argc, char *argv[])
 {
@@ -66,59 +69,58 @@ int main(int argc, char *argv[])
     instrStruct instrArr[state.numMemory];
 
     int binary[32];
-    for(int i = 0;i < state.numMemory;i++){
-        toBinary(&binary, state.mem[i]);
-        initialInstr(binary, &instrCode);
-        instrArr[i] = instrCode;
-        // printf("========== instruction check ========== \n");
-        // printf("opcode = %d\n", instrArr[i].opcode);
-        // printf("arg0 = %d\n", instrArr[i].arg0);
-        // printf("arg1 = %d\n", instrArr[i].arg1);
-        // printf("arg2 = %d\n", instrArr[i].arg2);
-        // printf("======================================= \n");
+    int round =0;
+    int haltFlag = 0;
 
-        switch (instrArr[i].opcode)
+    while(state.pc < state.numMemory && haltFlag == 0){
+        toBinary(binary, state.mem[state.pc]);
+        initialInstr(binary, &instrCode);
+        instrArr[state.pc] = instrCode;
+        round++;
+
+        switch (instrArr[state.pc].opcode)
         {
         case 0:
             //add
-            if(instrArr[i].arg0 != 0 && instrArr[i].arg1 != 0){
-            add(instrArr[i],&state);
-            }
+            add(instrArr[state.pc],&state);
             break;
         case 1:
             //nand
-            nand(instrArr[i],&state);
+            nand(instrArr[state.pc],&state);
             break;
         case 2:
             //lw
-            lw(instrArr[i],&state);
+            lw(instrArr[state.pc],&state);
+            
             break;
         case 3:
             //sw
-            sw(instrArr[i],&state);
+            sw(instrArr[state.pc],&state);
+            
             break;
         case 4:
             //beq
+            beq(instrArr[state.pc],&state);
             break;
         case 5:
             //jalr
+            jalr(instrArr[state.pc],&state);
             break;
         case 6:
             //halt
+            halt(instrArr[state.pc],&state, round, &haltFlag);
             break;
         case 7:
             //noop
+            state.pc++;
             break;
         
         default:
             exit(1);
             break;
         }
-        
-    }
-    // lw(instrArr[0],&state);
-    // lw(instrArr[1],&state);
 
+    }
     return(0);
 }
 
@@ -156,7 +158,6 @@ void toBinary(int *binary, int assembly){
 void initialInstr(int *binary,instrStruct *instr){
     int power = pow(2,15);
     int sum = 0;
-    // opcode - 24,23,22
     instr->opcode = (binary[22]*1) + (binary[23]*2) + (binary[24]*4);
     switch(instr->opcode){
         // add instr
@@ -251,6 +252,18 @@ void sw(instrStruct instr,stateType *state){
     printState(state);
 }
 
+void beq(instrStruct instr,stateType *state){
+    int address;
+    address = state->pc + 1 + instr.arg2;
+    if(state->reg[instr.arg0] == state->reg[instr.arg1]){
+        state->pc = address;
+        printState(state);
+    }else{
+        state->pc++;
+        printState(state);
+    }
+}
+
 void add(instrStruct instr,stateType *state){
     int sum;
     sum = state->reg[instr.arg0] + state->reg[instr.arg1];
@@ -267,4 +280,32 @@ void nand(instrStruct instr,stateType *state){
     state->reg[instr.arg2] = nand;
     state->pc++;
     printState(state);
+}
+
+void jalr(instrStruct instr,stateType *state){
+    int address;
+    int arg0T = state->reg[instr.arg0]; //rA
+    int arg1T = state->reg[instr.arg1]; //rB
+    address = state->pc+1;
+    state->reg[instr.arg1] = address; //save pc+1 --> rB
+    if(state->reg[instr.arg1] != state->reg[instr.arg0]){
+        state->pc = state->reg[instr.arg1]; //jump rA(add)
+    }
+    else {
+        // jump pc+1
+        state->pc = address;
+    }
+    state->pc++;
+    printState(state);
+}
+
+void halt(instrStruct instr,stateType *state, int round, int *flag){
+    state->pc++;
+    printf("machine halted \n");
+    printf("total of ");
+    printf("%d",round);
+    printf(" instructions executed \n");
+    printf("final state of machine:");
+    printState(state);
+    *flag = 1;
 }
