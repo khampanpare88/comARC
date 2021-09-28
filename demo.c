@@ -290,9 +290,9 @@ int toIType(char *label, int opcode, char *arg0,
             arg2B = arg2B-labelv;
             printf("%d \n",labelv);*/
             offset = findaddress(argv,arg2);
-            if (opcode == 100)
+            if (opcode == 0b100)
             {
-                arg2B = arg2B - lineNumber;
+                arg2B = offset - lineNumber;
             }
             else{
                 arg2B = offset;
