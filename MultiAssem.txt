@@ -1,7 +1,16 @@
  lw 0 1 one 
  lw 0 2 mcand 
  lw 0 3 mplier
+ lw 0 7 product
+start nand 1 3 4
+ nand 4 4 4 now mplier0 is at r4
+ beq 0 4 mp0
+ add macnd product product
+mp0 add 
 done halt
 one .fill 1
-mcand .fill 3
-mplier .fill 8
+mcand .fill 8
+mplier .fill 3
+product .fill 0
+strAdr .fill start
+subAdr .fill mp0
