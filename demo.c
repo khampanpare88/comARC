@@ -273,6 +273,7 @@ int toJType(char *label, int opcode, char *arg0,
 int toIType(char *label, int opcode, char *arg0,
     char *arg1, char *arg2, char *argv, int lineNumber){
         int instr = 0b0;
+        int offset;
         // convert arg to binary
         int arg0B = atoi (arg0);
         int arg1B = atoi (arg1);
@@ -288,8 +289,14 @@ int toIType(char *label, int opcode, char *arg0,
             /*
             arg2B = arg2B-labelv;
             printf("%d \n",labelv);*/
-            arg2B = findaddress(argv,arg2);
-            arg2B = arg2B - lineNumber;
+            offset = findaddress(argv,arg2);
+            if (opcode == 100)
+            {
+                arg2B = arg2B - lineNumber;
+            }
+            else{
+                arg2B = offset;
+            }
         }
         if(arg2B > -32768 && arg2B < 32767){
                 if(arg2B < 0){
