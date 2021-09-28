@@ -254,7 +254,7 @@ void opCodeCheck(char *opcodeCheck){
         strcmp(opcodeCheck, "halt") &&
         strcmp(opcodeCheck, "noop") &&
         strcmp(opcodeCheck, ".fill")){
-            printf("error: restricted opcode\n");
+            printf("error: undefined opcode\n");
             exit(1);
     }
 }

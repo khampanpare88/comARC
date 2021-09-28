@@ -1,0 +1,7 @@
+ lw 0 1 one 
+ lw 0 2 mcand 
+ lw 0 3 mplier
+done halt
+one .fill 1
+mcand .fill 3
+mplier .fill 8
