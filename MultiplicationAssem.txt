@@ -12,8 +12,8 @@ noAdd add 7 7 7 (shift left factor for round checking and mplier checking)
  add 2 2 2 (shift left mcand)
  beq 0 0 loop (return to the loop)
 end halt
-mcand .fill 7699
-mplier .fill 1245
+mcand .fill 7699 (put multiplicand here)
+mplier .fill 1245 (put multiplier here)
 factor .fill 1
 product .fill 0
 loopAdr .fill loop
