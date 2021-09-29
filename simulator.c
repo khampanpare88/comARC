@@ -10,7 +10,7 @@
 typedef struct stateStruct {
     int pc;
     int mem[NUMMEMORY];
-    int reg[NUMREGS];
+    long long int reg[NUMREGS];
     int numMemory;
 } stateType;
 
@@ -89,12 +89,10 @@ int main(int argc, char *argv[])
         case 2:
             //lw
             lw(instrArr[state.pc],&state);
-            
             break;
         case 3:
             //sw
             sw(instrArr[state.pc],&state);
-            
             break;
         case 4:
             //beq
@@ -263,7 +261,7 @@ void beq(instrStruct instr,stateType *state){
 }
 
 void add(instrStruct instr,stateType *state){
-    int sum;
+    long long int sum;
     sum = state->reg[instr.arg0] + state->reg[instr.arg1];
     state->reg[instr.arg2] = sum;
     state->pc++;
@@ -271,10 +269,14 @@ void add(instrStruct instr,stateType *state){
 }
 
 void nand(instrStruct instr,stateType *state){
-    int nand;
+    long long int nand = 0;
     int arg0T = state->reg[instr.arg0];
     int arg1T = state->reg[instr.arg1];
-    nand = !((arg0T%2)*(arg1T%2))*1 + !(((arg0T/2)%2)*((arg1T/2)%2))*2 + !(((arg0T/4)%2)*((arg1T/4)%2))*4;
+    int factor = 1;
+    for(int i=0; i<15; i++){
+        nand = nand + !(((arg0T/factor)%2)*((arg1T/factor)%2))*factor;
+        factor = factor*2;
+    }
     state->reg[instr.arg2] = nand;
     state->pc++;
     printState(state);

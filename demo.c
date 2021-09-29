@@ -219,6 +219,7 @@ int findaddress(char *arg, char *target){
             address++;
         }
         printf("error: undefined label\n");
+        printf("%s",target);
         exit(1);
         return 0;
 }

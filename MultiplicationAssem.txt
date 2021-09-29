@@ -1,0 +1,22 @@
+ lw 0 1 product
+ lw 0 2 mcand
+ lw 0 3 mplier
+ lw 0 6 lastRound
+ lw 0 7 factor
+loop beq 7 6 end (loop for 15 rounds because we assume that our input is 15 bits)
+ nand 3 7 4 
+ nand 4 4 4 (AND mplier and factor to check the value of that factor is 0 or 1)
+ beq 4 0 noAdd (if it is 0 go to noAdd)
+ add 1 2 1 (if mplier is 1 let product = product+mcand)
+noAdd add 7 7 7 (shift left factor for round checking and mplier checking)
+ add 2 2 2 (shift left mcand)
+ beq 0 0 loop (return to the loop)
+end halt
+mcand .fill 7699
+mplier .fill 1245
+factor .fill 1
+product .fill 0
+loopAdr .fill loop
+lastRound .fill 32768
+endAdr .fill end
+noAddAdr .fill noAdd
