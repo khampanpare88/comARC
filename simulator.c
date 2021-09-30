@@ -70,6 +70,12 @@ int main(int argc, char *argv[])
     int round =0;
     int haltFlag = 0;
 
+   /* for(int i=0;i<state.numMemory;i++){
+        toBinary(binary, state.mem[i]);
+        initialInstr(binary, &instrCode);
+        instrArr[i] = instrCode;
+    }*/
+
     while(state.pc < state.numMemory && haltFlag == 0){
         toBinary(binary, state.mem[state.pc]);
         initialInstr(binary, &instrCode);
@@ -242,8 +248,9 @@ void lw(instrStruct instr,stateType *state){
 
 void sw(instrStruct instr,stateType *state){
     int memAddr;
-    memAddr = instr.arg2 + state->reg[instr.arg1];
-    state->reg[instr.arg0] = state->mem[memAddr];
+    memAddr = instr.arg2 + state->reg[instr.arg0];
+    state->numMemory=memAddr;
+    state->mem[memAddr] = state->reg[instr.arg1];
     state->pc++;
     printState(state);
 }
@@ -288,14 +295,13 @@ void jalr(instrStruct instr,stateType *state){
     int arg1T = state->reg[instr.arg1]; //rB
     address = state->pc+1;
     state->reg[instr.arg1] = address; //save pc+1 --> rB
-    if(state->reg[instr.arg1] != state->reg[instr.arg0]){
-        state->pc = state->reg[instr.arg1]; //jump rA(add)
+    if(instr.arg1 != instr.arg0){
+        state->pc = state->reg[instr.arg0]; //jump rA(add)
     }
     else {
         // jump pc+1
         state->pc = address;
     }
-    state->pc++;
     printState(state);
 }
 
