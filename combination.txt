@@ -1,11 +1,41 @@
+ lw 0 5 pos1
  lw 0 1 n
  lw 0 2 r
- lw 0 6 combi 
- jalr 
+ lw 0 6 cAddr 
+ jalr 6 4
  halt
 combi sw 7 4 stack
  add 7 5 7
-
-n .fill
-r .fill
+ sw 7 1 stack
+ add 7 5 7
+ sw 7 2 stack
+ add 7 5 7
+ beq 0 2 else
+ beq 1 2 else
+ lw 0 6 neg1
+ add 1 6 1
+ add 2 6 2
+ add 3 6 3
+ lw 0 6 cAddr
+ jalr 6 4
+ add 2 5 2
+ lw 0 6 cAddr
+ jalr 6 4
+ lw 0 6 neg1
+ add 2 6 2
+else add 5 3 3
+ lw 0 6 neg1
+ add 7 6 7
+ lw 7 2 stack
+ add 7 6 7
+ lw 7 1 stack
+ add 7 6 7
+ lw 7 4 stack
+ jalr 4 6
+n .fill 7
+r .fill 4
+pos1 .fill 1
+neg1 .fill -1
+zero .fill 0
+cAddr .fill combi
 stack .fill 0
