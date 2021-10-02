@@ -1,22 +1,28 @@
- lw 0 1 product
- lw 0 2 mcand
- lw 0 3 mplier
- lw 0 6 lastRound
- lw 0 7 factor
-loop beq 7 6 end (loop for 15 rounds because we assume that our input is 15 bits)
- nand 3 7 4 
- nand 4 4 4 (AND mplier and factor to check the value of that factor is 0 or 1)
- beq 4 0 noAdd (if it is 0 go to noAdd)
- add 1 2 1 (if mplier is 1 let product = product+mcand)
-noAdd add 7 7 7 (shift left factor for round checking and mplier checking)
- add 2 2 2 (shift left mcand)
- beq 0 0 loop (return to the loop)
+ lw 0 1 product     $1 = product
+ lw 0 2 mcand       $2 = mcand
+ lw 0 3 mplier      $3 = mplier
+ lw 0 5 one         $5 = 1
+ lw 0 6 lastRound   $6 = 2^16 = 32768
+ lw 0 7 factor      $7 = factor
+loop beq 7 6 end    loop for 15 rounds because we assume that our input is 15 bits
+ nand 3 7 4         nand mplier with factor
+ add 4 5 4          increasing result by 1
+ beq 4 7 addPd      if the result = factor go to addPd
+ nand 3 7 4         else nand mplier with factor again
+ nand 4 4 4         and nand the result with itself. line 11 and 12 perform as $3 AND $7
+ beq 4 0 noAdd      if the result = 0 go to noAdd
+addPd add 1 2 1     else if the resul is 1 let product = product+mcand
+noAdd add 7 7 7     shift left factor for round checking and mplier checking
+ add 2 2 2          shift left mcand
+ beq 0 0 loop       return to the loop
 end halt
-mcand .fill 7699 (put multiplicand here)
-mplier .fill 1245 (put multiplier here)
+mcand .fill 32766   mem[18] = multiplicand
+mplier .fill 10383  mem[19] = multiplier
 factor .fill 1
+one .fill 1
 product .fill 0
 loopAdr .fill loop
 lastRound .fill 32768
 endAdr .fill end
 noAddAdr .fill noAdd
+addPdAdr .fill addPd

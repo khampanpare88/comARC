@@ -32,6 +32,7 @@ void add(instrStruct,stateType *);
 void nand(instrStruct,stateType *);
 void jalr(instrStruct,stateType *);
 void halt(instrStruct,stateType *,int,int *);
+int binaryLen(int);
 
 int main(int argc, char *argv[])
 {
@@ -151,6 +152,18 @@ void toBinary(int *binary, int assembly){
     }
 }
 
+int binaryLen(int dec){
+    int count = 0;
+    if(dec == 0){
+        return 1;
+    }else{
+        while(dec!=0){
+            count++;
+            dec = dec/2;
+        }
+        return count;
+    }
+}
 void initialInstr(int *binary,instrStruct *instr){
     int power = pow(2,15);
     int sum = 0;
@@ -273,7 +286,13 @@ void nand(instrStruct instr,stateType *state){
     int arg0T = state->reg[instr.arg0];
     int arg1T = state->reg[instr.arg1];
     int factor = 1;
-    for(int i=0; i<15; i++){
+    int lenght;
+    if(arg0T > arg1T){
+        lenght = binaryLen(arg0T);
+    }else{
+        lenght = binaryLen(arg1T);
+    }
+    for(int i=0; i<lenght; i++){
         nand = nand + !(((arg0T/factor)%2)*((arg1T/factor)%2))*factor;
         factor = factor*2;
     }
