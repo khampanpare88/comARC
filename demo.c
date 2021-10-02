@@ -85,11 +85,13 @@ int main(int argc, char *argv[])
             fprintf(outFilePtr, "%d", wr);
         }
         if (!strcmp(opcode, "halt")) {
+            /* do whatever you need to do for opcode "halt" */
             int op = 0b110;
             int wr = toOType(op);
             fprintf(outFilePtr, "%d", wr);
         }
         if (!strcmp(opcode, "noop")) {
+            /* do whatever you need to do for opcode "noop" */
             int op = 0b111;
             int wr = toOType(op);
             fprintf(outFilePtr, "%d", wr);
@@ -200,6 +202,7 @@ int toRType(char *label, int opcode, char *arg0,
 }
 
 int toOType(int opcode){
+    // place arguments into instruction
     int instr = opcode << 22;
     return instr;
 }
@@ -281,15 +284,10 @@ int toIType(char *label, int opcode, char *arg0,
         // 2'complement
         int arg2B;
         int labelv;
-        //printf("%d \n",arg2);
         if(isNumber(arg2) == 1){
             arg2B = atoi (arg2);
         }
         else{
-            //labelv = findaddress(argv,);
-            /*
-            arg2B = arg2B-labelv;
-            printf("%d \n",labelv);*/
             offset = findaddress(argv,arg2);
             if (opcode == 0b100)
             {
@@ -317,7 +315,6 @@ int toIType(char *label, int opcode, char *arg0,
                     int carry = 1;                        
                     int carryin = 0;
                     //+1 ที่บิตสุดท้าย
-                    
                     if(binary[0] == 1 && carry == 1){
                         binary[0] = 0;
                         carryin = 1;
