@@ -68,14 +68,8 @@ int main(int argc, char *argv[])
     instrStruct instrArr[state.numMemory];
 
     int binary[32];
-    int round =0;
+    int round = 0;
     int haltFlag = 0;
-
-   /* for(int i=0;i<state.numMemory;i++){
-        toBinary(binary, state.mem[i]);
-        initialInstr(binary, &instrCode);
-        instrArr[i] = instrCode;
-    }*/
 
     while(state.pc < state.numMemory && haltFlag == 0){
         toBinary(binary, state.mem[state.pc]);
@@ -170,6 +164,7 @@ int binaryLen(int dec){
         return count;
     }
 }
+
 void initialInstr(int *binary,instrStruct *instr){
     int power = pow(2,15);
     int sum = 0;

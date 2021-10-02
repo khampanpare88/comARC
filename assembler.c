@@ -233,8 +233,6 @@ void labelCheck(char *arg, char *tempCheck){
     int flag = 0;
     FilePtr = fopen(FileString, "r");
         while (readAndParse(FilePtr, labelT, opcodeT, arg0T, arg1T, arg2T)){
-          //  printf("checking Line :\n");
-        //    printf("label = %s , op = %s , arg0 = %s , arg1 = %s , arg2 = %s \n", labelT, opcodeT,arg0T,arg1T,arg2T);
             if(!strcmp (tempCheck,labelT)){
                 flag++;
             }
@@ -246,7 +244,6 @@ void labelCheck(char *arg, char *tempCheck){
 }
 
 void opCodeCheck(char *opcodeCheck){
-   // printf("op = %s t/f = %d", opcodeCheck, strcmp(opcodeCheck, "lw") && 273);
     if( strcmp(opcodeCheck, "add") &&
         strcmp(opcodeCheck, "nand") &&
         strcmp(opcodeCheck, "lw") &&
