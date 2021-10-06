@@ -34,6 +34,7 @@ void jalr(instrStruct,stateType *);
 void halt(instrStruct,stateType *,int,int *);
 int binaryLen(int);
 
+
 int main(int argc, char *argv[])
 {
     char line[MAXLINELENGTH];
@@ -65,47 +66,53 @@ int main(int argc, char *argv[])
 
     initialState(&state);
 
-    instrStruct instrArr[state.numMemory];
+    instrStruct instrArr[state.numMemory+1];
 
     int binary[32];
-    int round = 0;
+    int round =0;
     int haltFlag = 0;
 
-    while(state.pc < state.numMemory && haltFlag == 0){
+   /* for(int i=0;i<state.numMemory;i++){
+        toBinary(binary, state.mem[i]);
+        initialInstr(binary, &instrCode);
+        instrArr[i] = instrCode;
+    }*/
+
+    while(state.pc < state.numMemory+1 && haltFlag == 0){
         toBinary(binary, state.mem[state.pc]);
         initialInstr(binary, &instrCode);
-        instrArr[state.pc] = instrCode;
+        instrArr[state.pc+1] = instrCode;
         round++;
 
-        switch (instrArr[state.pc].opcode)
+        switch (instrArr[state.pc+1].opcode)
         {
         case 0:
             //add
-            add(instrArr[state.pc],&state);
+            add(instrArr[state.pc+1],&state);
             break;
         case 1:
             //nand
-            nand(instrArr[state.pc],&state);
+            nand(instrArr[state.pc+1],&state);
             break;
         case 2:
             //lw
-            lw(instrArr[state.pc],&state);
+            lw(instrArr[state.pc+1],&state);
             break;
         case 3:
             //sw
-            sw(instrArr[state.pc],&state);
+            sw(instrArr[state.pc+1],&state);
             break;
         case 4:
             //beq
-            beq(instrArr[state.pc],&state);
+            beq(instrArr[state.pc+1],&state);
             break;
         case 5:
             //jalr
-            jalr(instrArr[state.pc],&state);
+            jalr(instrArr[state.pc+1],&state);
             break;
         case 6:
             //halt
-            halt(instrArr[state.pc],&state, round, &haltFlag);
+            halt(instrArr[state.pc+1],&state, round, &haltFlag);
             break;
         case 7:
             //noop
@@ -309,6 +316,8 @@ void jalr(instrStruct instr,stateType *state){
     int arg1T = state->reg[instr.arg1]; //rB
     address = state->pc+1;
     state->reg[instr.arg1] = address; //save pc+1 --> rB
+    state->pc++;
+    printState(state);
     if(instr.arg1 != instr.arg0){
         state->pc = state->reg[instr.arg0]; //jump rA(add)
     }
@@ -316,7 +325,6 @@ void jalr(instrStruct instr,stateType *state){
         // jump pc+1
         state->pc = address;
     }
-    printState(state);
 }
 
 void halt(instrStruct instr,stateType *state, int round, int *flag){
