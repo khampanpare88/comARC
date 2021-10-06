@@ -49,50 +49,60 @@ int main(int argc, char *argv[])
         if(strlen(label)!=0){
             labelCheck(argv[1], label);
         }
+        // checking the opcode
         opCodeCheck(opcode);
         if (!strcmp(opcode, "jalr")) {
-         /*do whatever you need to do for opcode "jalr" */ 
-        int op = 0b101;
-        int wr = 0;
-        int arg2 = 0b0000000000000000;
-        wr = toJType(label, op, arg0, arg1, arg2);
-        fprintf(outFilePtr, "%d", wr);
+         /*do whatever you need to do for opcode " jalr" */ 
+        int op = 0b101;                                              //set opcode = 101
+        int wr = 0;                                     
+        int arg2 = 0b0000000000000000;                //set 15-0 bit = 0
+        wr = toJType(label, op, arg0, arg1, arg2);   
+       //call toJType function to create machine code of jalr instruction
+        fprintf(outFilePtr, "%d", wr); 
+      //wirte jalr instruction to output file
+
         }
         if (!strcmp(opcode, ".fill")) {
-            if(isNumber(arg0)){
-                int wr = atoi(arg0);
+            if(isNumber(arg0)){ 			 //check arg0 is a number or not
+                int wr = atoi(arg0); 
                 fprintf(outFilePtr, "%d", wr);
             }else{
                 const char *target=arg0;
-                int wr=findaddress(argv[1],arg0);
+                int wr=findaddress(argv[1],arg0); 	 //call function findaddress to create instruction
                 fprintf(outFilePtr, "%d", wr);
             }
         }
         if (!strcmp(opcode, "add")) {
-        /* do whatever you need to do for opcode "add" */
+        /* do whatever you need to do for opcode "add" */\
+	// let opcode = 000
             int op = 0b000;
-            int wr;
+            int wr = 0;
+            // wr is the result of add instruction
             wr = toRType(label, op, arg0, arg1, arg2);
+	// write the instruction into the output file
             fprintf(outFilePtr, "%d", wr);
         }
         if (!strcmp(opcode, "nand")) {
         /* do whatever you need to do for opcode "nand" */
+	// let opcode = 001
             int op = 0b001;
             int wr = 0;
+	// wr is the result of add instruction
             wr = toRType(label, op, arg0, arg1, arg2);
+	// write the instruction into the output file
             fprintf(outFilePtr, "%d", wr);
         }
         if (!strcmp(opcode, "halt")) {
             /* do whatever you need to do for opcode "halt" */
-            int op = 0b110;
-            int wr = toOType(op);
-            fprintf(outFilePtr, "%d", wr);
+            int op = 0b110;		// set opcode = 111
+            int wr = toOType(op);		// call function OType to create instruction
+            fprintf(outFilePtr, "%d", wr);	//write the instruction into output file
         }
         if (!strcmp(opcode, "noop")) {
             /* do whatever you need to do for opcode "noop" */
-            int op = 0b111;
-            int wr = toOType(op);
-            fprintf(outFilePtr, "%d", wr);
+            int op = 0b111;		// set opcode = 111
+            int wr = toOType(op);		// call function OType to create instruction
+            fprintf(outFilePtr, "%d", wr);	//write the instruction  into output file
         }
         if (!strcmp(opcode, "lw")) {
         /* do whatever you need to do for opcode "lw" */
@@ -187,6 +197,7 @@ int isNumber(char *string)
     return( (sscanf(string, "%d", &i)) == 1);
 }
 
+// convert the assembly to Rtype instruction
 int toRType(char *label, int opcode, char *arg0,
     char *arg1, char *arg2){
         int instr = 0b0;
@@ -201,8 +212,8 @@ int toRType(char *label, int opcode, char *arg0,
 
 int toOType(int opcode){
     // place arguments into instruction
-    int instr = opcode << 22;
-    return instr;
+    int instr = opcode << 22;	// shift left opcode to bit 24 ,23 ,22
+    return instr;			    // return instruction
 }
 
 int findaddress(char *arg, char *target){
@@ -219,12 +230,14 @@ int findaddress(char *arg, char *target){
             }
             address++;
         }
+        // if the label is not match any label in the input file
+        // print ‘undefined label’ and send error exit(1)
         printf("error: undefined label\n");
-        printf("%s",target);
         exit(1);
         return 0;
 }
 
+// check for duplicated label
 void labelCheck(char *arg, char *tempCheck){
     char labelT[MAXLINELENGTH], opcodeT[MAXLINELENGTH], arg0T[MAXLINELENGTH],
             arg1T[MAXLINELENGTH], arg2T[MAXLINELENGTH];
@@ -232,18 +245,25 @@ void labelCheck(char *arg, char *tempCheck){
     char *FileString = arg; 
     int flag = 0;
     FilePtr = fopen(FileString, "r");
+        // read the input file
         while (readAndParse(FilePtr, labelT, opcodeT, arg0T, arg1T, arg2T)){
+	    // if there is any duplicated label 
             if(!strcmp (tempCheck,labelT)){
+	    // increasing flag
                 flag++;
             }
-        }
+        } 
+        // if flag is more than 1
         if(flag > 1){
+	    // print ‘duplicated label’ and send error exit(1)
             printf("error: duplicated label\n");
             exit(1);
         }
 }
 
-void opCodeCheck(char *opcodeCheck){
+// check for undefined opcode
+void opCodeCheck(char *opcodeCheck){ 
+    // if the opcode is not equal to the following below
     if( strcmp(opcodeCheck, "add") &&
         strcmp(opcodeCheck, "nand") &&
         strcmp(opcodeCheck, "lw") &&
@@ -253,11 +273,12 @@ void opCodeCheck(char *opcodeCheck){
         strcmp(opcodeCheck, "halt") &&
         strcmp(opcodeCheck, "noop") &&
         strcmp(opcodeCheck, ".fill")){
+	// print ‘undefined opcode’ and send error exit(1)
             printf("error: undefined opcode\n");
             exit(1);
     }
 }
-
+//convert assembly to  J-Type Instruction
 int toJType(char *label, int opcode, char *arg0,
     char *arg1, int arg2){
         int instr = 0b0;
@@ -266,7 +287,7 @@ int toJType(char *label, int opcode, char *arg0,
         int arg1B = atoi (arg1);
         // place arguments into instruction
         instr = ((((((((instr << 3) + opcode) << 3) + arg0B) << 3) + arg1B) << 16) + arg2); 
-    return instr;
+    return instr;      //return instruction
 }
 
 int toIType(char *label, int opcode, char *arg0,
@@ -292,6 +313,7 @@ int toIType(char *label, int opcode, char *arg0,
                 arg2B = offset;
             }
         }
+        // check offsetField
         if(arg2B > -32768 && arg2B < 32767){
                 if(arg2B < 0){
                     int temp = fabs(arg2B);

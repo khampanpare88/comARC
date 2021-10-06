@@ -32,8 +32,8 @@ else add 5 3 3          $3 = $3+1
  add 7 6 7              decrement stack pointer
  lw 7 4 stack           recover original return address
  jalr 4 6               return.  $6 is not restored.
-n .fill 2               input n
-r .fill 1               input r
+n .fill 7               input n
+r .fill 3               input r
 pos1 .fill 1
 neg1 .fill -1
 zero .fill 0
